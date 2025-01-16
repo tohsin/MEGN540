@@ -1,5 +1,6 @@
 # ALL BIN FILES
 BIN/*
+bin/*
 
 #vscode files
 .vscode/*
