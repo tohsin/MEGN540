@@ -75,6 +75,12 @@ static void _USB_Read_Data()
     // will need to adjust to make it non blocking. You'll need to dig into the library to understand
     // how the function above is working then interact at a slightly lower level, but still higher than
     // register level.
+    
+    if( Endpoint_IsOUTReceived()){
+        rb_push_back_B( &_usb_receive_buffer, Endpoint_Read_8());
+        Endpoint_Discard_8();
+    }
+   
 }
 
 /**
@@ -88,6 +94,10 @@ static void _USB_Write_Data()
     // will need to adjust to make it non blocking. You'll need to dig into the library to understand
     // how the function above is working then interact at a slightly lower level, but still higher than
     // register level.
+    //if( Endpoint_IsINReady() && rb_length_B( &_usb_send_buffer ) != 0 )
+    Endpoint_Write_8(rb_pop_front_B( &_usb_send_buffer);) 
+    
+
 }
 
 void Task_USB_Upkeep()
@@ -166,6 +176,7 @@ void USB_Send_Byte( uint8_t byte )
     // *** MEGN540  ***
     // YOUR CODE HERE
     // This should only interface with the ring buffers and use your ring buffer functions.
+    rb_push_back_B( &_usb_send_buffer, byte );
 }
 
 /**
@@ -178,6 +189,9 @@ void USB_Send_Data( void* p_data, uint8_t data_len )
     // *** MEGN540  ***
     // YOUR CODE HERE
     // This should only interface with the ring buffers and use your ring buffer functions.
+    for( uint8_t i = 0; i < data_len; i++ ) {
+        USB_Send_Byte( ((uint8_t*)p_data)[i]);
+    }
 }
 
 /**
@@ -189,6 +203,10 @@ void USB_Send_Str( char* p_str )
     // *** MEGN540  ***
     // YOUR CODE HERE. Remember c-srtings are null terminated, so make sure to send that zero!
     // This should only interface with the ring buffers and use your ring buffer functions.
+    for( uint8_t i = 0; p_str[i] != '\0'; i++ ) {
+        USB_Send_Byte( p_str[i] );
+    }
+    USB_Send_Byte( '\0' );
 }
 
 /**
@@ -223,6 +241,12 @@ void USB_Send_Msg( char* format, char cmd, void* p_data, uint8_t data_len )
     //      usb_send_byte <-- cmd
     //      usb_send_data <-- p_data
     // FUNCTION END
+    uint8_t format_length = 0;
+    for( ; format[format_length] != '\0'; format_length++ );
+    uint8_t msg_length = 1 + format_length + data_len;
+
+
+
 }
 
 /**
@@ -234,7 +258,7 @@ uint8_t USB_Msg_Length()
     // *** MEGN540  ***
     // YOUR CODE HERE
     // This should only interface with the ring buffers and use your ring buffer functions.
-    return 0;
+    return rb_length_B( &_usb_receive_buffer );
 }
 
 /**
@@ -246,7 +270,7 @@ uint8_t USB_Msg_Peek()
     // *** MEGN540  ***
     // YOUR CODE HERE
     // This should only interface with the ring buffers and use your ring buffer functions.
-    return 0;
+    return rb_get_B( &_usb_receive_buffer, _usb_receive_buffer->start_index );
 }
 
 /**
@@ -258,7 +282,7 @@ uint8_t USB_Msg_Get()
     // *** MEGN540  ***
     // YOUR CODE HERE
     // This should only interface with the ring buffers and use your ring buffer functions.
-    return 0;
+    return rb_pop_front_B( &_usb_receive_buffer);
 }
 
 /**
@@ -275,7 +299,14 @@ bool USB_Msg_Read_Into( void* p_obj, uint8_t data_len )
     // *** MEGN540  ***
     // YOUR CODE HERE
     // This should only interface with the ring buffers and use your ring buffer functions.
-    return false;
+    if(rb_length_B(&_usb_receive_buffer) < data_len){
+        return false;
+    }
+    for(uint8_t i =0; i<data_len; i++){
+      
+        ((uint8_t*)p_obj)[i] = rb_pop_front_B(&_usb_receive_buffer);
+    }
+    return true;
 }
 
 /**
