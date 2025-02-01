@@ -251,9 +251,15 @@ void USB_Send_Msg( char* format, char cmd, void* p_data, uint8_t data_len )
     // FUNCTION END
 
 
-    // uint8_t format_length = 0;
-    // for( ; format[format_length] != '\0'; format_length++ );
-    // uint8_t msg_length = 1 + format_length + data_len;
+    uint8_t format_length = 1; 
+    for( ; format[format_length] != '\0'; format_length++ );
+    format_length++;
+    uint8_t msg_length = 1 + format_length + data_len;
+
+    USB_Send_Byte(msg_length);
+    USB_Send_Str(&format); //Not sure if this is proper pointer usage
+    USB_Send_Byte(cmd);
+    USB_Send_Data(&p_data,data_len) //Same here
 
 
 
@@ -328,6 +334,11 @@ void USB_Flush_Input_Buffer()
     // *** MEGN540  ***
     // YOUR CODE HERE
     // This should only interface with the ring buffers and use your ring buffer functions.
+    while ( _usb_receive_buffer.start_index != _usb_receive_buffer.end_index)
+    {
+        rb_pop_back_B(&_usb_receive_buffer);
+    }
+    
 }
 
 /** Configures the board hardware and chip peripherals for the demo's functionality. */
