@@ -103,7 +103,7 @@ static void _USB_Write_Data()
     if( USB_DeviceState != DEVICE_STATE_Configured )
         return;
     Endpoint_SelectEndpoint( CDC_TX_EPADDR );
-    if(rb_length_B(&_usb_send_buffer) != 0){
+    if(rb_length_B(&_usb_send_buffer) != 0 && Endpoint_IsINReady()){
     // if(rb_length_B(&_usb_send_buffer)){
           Endpoint_Write_8(rb_pop_front_B( &_usb_send_buffer)); 
     }else
@@ -465,3 +465,8 @@ void EVENT_USB_Device_ControlRequest( void )
             break;
     }
 }
+
+// void debug_USB(char* msg){
+//     USB_Msg_Get();
+//     USB_Send_Byte(msg);
+// }
