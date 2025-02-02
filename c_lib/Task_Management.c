@@ -86,5 +86,12 @@ bool Task_Run_If_Ready( Task_t* task )
     //
     // Run it if it is ready
 
-    return false;  // true if it ran, false if it did not run
+    if(Task_Is_Ready(task)){
+        if (task->task_fcn_ptr ){
+            task->task_fcn_ptr(0.0f);
+            return true;
+        }
+        return false;
+    }
+    return false;
 }
