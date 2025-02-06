@@ -353,13 +353,24 @@ void USB_Flush_Input_Buffer()
     // *** MEGN540  ***
     // YOUR CODE HERE
     // This should only interface with the ring buffers and use your ring buffer functions.
-    while ( _usb_receive_buffer.start_index != _usb_receive_buffer.end_index)
+    rb_initialize_B(&_usb_receive_buffer);
+    // while ( _usb_receive_buffer.start_index != _usb_receive_buffer.end_index)
+    // {
+    //     rb_pop_back_B(&_usb_receive_buffer);
+    // }
+    
+}
+void USB_Flush_Ouput_Buffer()
+{
+    // *** MEGN540  ***
+    // YOUR CODE HERE
+    // This should only interface with the ring buffers and use your ring buffer functions.
+    while ( _usb_send_buffer.start_index != _usb_send_buffer.end_index)
     {
-        rb_pop_back_B(&_usb_receive_buffer);
+        rb_pop_back_B(&_usb_send_buffer);
     }
     
 }
-
 /** Configures the board hardware and chip peripherals for the demo's functionality. */
 void Initialize_USB( void )
 {
@@ -483,3 +494,18 @@ void EVENT_USB_Device_ControlRequest( void )
 //     USB_Msg_Get();
 //     USB_Send_Byte(msg);
 // }
+
+
+void USB_Debug_Direct(const char* msg) {
+    if(USB_DeviceState != DEVICE_STATE_Configured)
+        return;
+        
+    Endpoint_SelectEndpoint(CDC_TX_EPADDR);
+    
+    uint16_t length = strlen(msg);
+    Endpoint_Write_Stream_LE(msg, length, NULL);
+    Endpoint_ClearIN();
+    
+    Endpoint_WaitUntilReady();
+    Endpoint_ClearIN();
+}

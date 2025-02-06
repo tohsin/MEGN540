@@ -166,6 +166,7 @@ bool USB_Msg_Read_Into( void* p_obj, uint8_t data_len );
  * any bytes that remaining.
  */
 void USB_Flush_Input_Buffer();
+void USB_Flush_Ouput_Buffer();
 
 // LUFA Event handeling functions that are defined but do not require modificaiton
 void EVENT_USB_Device_Connect( void );
@@ -173,4 +174,7 @@ void EVENT_USB_Device_Disconnect( void );
 void EVENT_USB_Device_ConfigurationChanged( void );
 void EVENT_USB_Device_ControlRequest( void );
 
+
+// Add to SerialIO.h
+void USB_Debug_Direct(const char* msg);
 #endif

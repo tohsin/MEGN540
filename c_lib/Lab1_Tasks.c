@@ -36,3 +36,12 @@ void Subtract_And_Send( float value_left, float value_right )
     // send response right here if appropriate.
     USB_Send_Msg( "cf", '-', &ret_val, sizeof( ret_val ) );
 }
+
+void send_error( void )
+{
+    float ret_val  = 0.0;
+
+    // send response right here if appropriate.
+    // USB_Send_Msg( "c", 'e', NULL, 0 );
+   USB_Send_Msg( "cf", 'e', &ret_val, sizeof( ret_val ) );
+}

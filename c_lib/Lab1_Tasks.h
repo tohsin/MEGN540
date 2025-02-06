@@ -51,5 +51,5 @@ void Multiply_And_Send( float value_left, float value_right );
 void Divide_And_Send( float value_left, float value_right );
 void Add_And_Send( float value_left, float value_right );
 void Subtract_And_Send( float value_left, float value_right );
-
+void send_error( void );
 #endif
